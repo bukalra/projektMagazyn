@@ -1,6 +1,13 @@
+import csv
+
 action = ''
 result = True
-items = [{'name':['Milk','Sugar','Flour','Coffe','Tea']}, {'quantity':[120,1000,1000,2000,444]},{'unit':['ml','mg','mg','mg','lll']},{'unit_price':[2.3,3,1.2,30,555]}]
+items = [{'name':['Milk','Sugar','Flour','Coffe','Tea']}, {'quantity':[1,2,3,4,5]},{'unit':['ml','mg','mg','mg','lll']},{'unit_price':[1,2,3,4,5]}]
+sold_items = [
+                     {'name':[]},
+                     {'quantity': []},
+                     {'unit': []},
+                     {'unit_price':[]}]
 
 def to_do(action):  
     if action == 'show':
@@ -9,10 +16,23 @@ def to_do(action):
         add_item()
     elif action == 'sell':
         sell_item()
+    elif action == 'show rev':
+        show_revenue()
+    elif action == 'save':
+        export_file_to_csv()
     elif action == 'exit':
         return True
     else:
         return False
+
+def export_file_to_csv():
+    with open('test.csv', 'w', newline='') as csvfile:
+        fieldnames = ['name','quantity','unit','unit_price']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        
+        for key, value in items.items():
+            writer.writerow([key, value])
 
 def add_item(name='', quantity ='', unit='', unit_price=''):
     print('Adding to warehouse...')
@@ -23,24 +43,68 @@ def add_item(name='', quantity ='', unit='', unit_price=''):
     print('Successfully added to warehouse. The current status is: ')
     get_items()
 
+def get_costs():
+    pass
+
+def sold_items_summary(name, quantity,unit,unit_price):
+    sold_items[0]['name'].append(name)
+    sold_items[1]['quantity'].append(quantity)
+    sold_items[2]['unit'].append(unit)
+    sold_items[3]['unit_price'].append(unit_price)
+
+    print(sold_items)
+
+def get_costs(sum_of_costs=0,list_of_costs=[]):
+    list_of_costs = [items[1]['quantity'][i] * items[3]['unit_price'][i] for i,_ in enumerate(items[0]['name'])]
+    sum_of_costs = sum(list_of_costs)
+    #print(sum_of_costs)
+    return sum_of_costs
+
+def get_income(sum_of_income=0,list_of_income=[]):
+    list_of_income = [sold_items[1]['quantity'][i] * sold_items[3]['unit_price'][i] for i,_ in enumerate(sold_items[0]['name'])]
+    sum_of_income = sum(list_of_income)
+    #print(sum_of_income)
+    return sum_of_income
+
+def show_revenue():
+    print('Revenue breakdown (PLN)')
+    print(f'Income:', get_costs())
+    print(f'Costs:', get_income())
+    print('------------')
+    print(f'Revenue:', get_income() - get_costs(),' PLN')
+
 def sell_item(name='', quantity=int()):
     name = input('Item name: ')
     name = name.capitalize()
+
+    quantity_index = items[0]['name'].index(name)
+    unit = items[2]['unit'][quantity_index]
+    unit_price = items[3]['unit_price'][quantity_index]
+    print(unit)
+    print(unit_price)
     if name not in items[0]['name']:
         print('There is no requested product.')
-    else:
 
+    else:
         quantity = int(input('Quantity to sell: '))
-        quantity_index = items[0]['name'].index(name)
+        
         if items[1]['quantity'][quantity_index] >= quantity:
             items[1]['quantity'][quantity_index] = items[1]['quantity'][quantity_index] - quantity
             print(f'Successfully sold {quantity} of {name}')
+            sold_items_summary(name, quantity,unit,unit_price)
             get_items()
-        else:    
-            print('There is not enough product to sell')
-        
-
-
+        else:
+            buy_all = input('There is no enough quantity to fulfil your request. Do you want to buy what is available? (yes/no')
+            if buy_all == 'yes':
+                items[1]['quantity'][quantity_index] = items[1]['quantity'][quantity_index] - quantity
+                if items[1]['quantity'][quantity_index] < 0:
+                    quantity = quantity+(items[1]['quantity'][quantity_index])
+                    items[1]['quantity'][quantity_index] = 0
+                    print(f'Successfully sold {quantity} of {name}')
+                    get_items()
+            else:
+                print('You can choose another item or different quantity. ')
+                
 def get_items():
     print('Name\tQuantity\tUnit\tUnit Price (PLN)')
     print('----\t--------\t----\t----------------')
@@ -49,11 +113,10 @@ def get_items():
     for param in items:
         for item in param.values():
             a.append(item)
-
     i = 0
     for entry in a[0]:
         print(a[0][i],'\t',a[1][i],'\t       ',a[2][i],'\t',a[3][i])
         i+=1
 
 while to_do(action) != True:
-    action = str(input('What do you want to do?'))
+    action = str(input('What would you like to do?'))
