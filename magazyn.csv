@@ -2,6 +2,6 @@ name,quantity,unit,unit_price
 Milk,1,ml,1
 Sugar,2,mg,2
 Flour,3,mg,3
-Coffe,4,mg,4
-Tea,5,lll,5
-ciapy,4,pcs,12
+ciapy,3,pcs,4
+wine,4,l,50
+Beer,5,l,5
