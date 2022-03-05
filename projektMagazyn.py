@@ -8,7 +8,6 @@ sold_items = [
                      {'quantity': []},
                      {'unit': []},
                      {'unit_price':[]}]
-
 def to_do(action):  
     if action == 'show':
         get_items()
@@ -20,6 +19,9 @@ def to_do(action):
         show_revenue()
     elif action == 'save':
         export_file_to_csv()
+    elif action == 'load':
+        items.clear()
+        import_items_from_csv()
     elif action == 'exit':
         return True
     else:
@@ -31,8 +33,41 @@ def export_file_to_csv():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         
-        for key, value in items.items():
-            writer.writerow([key, value])
+        b = []
+        for param in items:
+            for item in param.values():
+                b.append(item)
+                print(b)
+        i = 0
+        restructured = {}
+        for entry in b[0]:
+            restructured = {'name':b[0][i],'quantity':b[1][i],'unit':b[2][i],'unit_price':b[3][i]}
+            i+=1
+            writer.writerow(restructured)
+
+def import_items_from_csv():
+    with open('test.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        place_holder = []
+        place_holder_1 = []
+        place_holder_2 = []
+        place_holder_3 = []
+
+        for row in reader:
+            place_holder.append(row['name'])
+            place_holder_1.append(row['quantity'])
+            place_holder_2.append(row['unit'])
+            place_holder_3.append(row['unit_price'])
+
+        items = [{'name':[]}, {'quantity':[]}, {'unit':[]}, {'unit_price':[]}]
+        for i,each in enumerate(place_holder):
+            items[0]['name'].append(place_holder[i])
+            items[1]['quantity'].append(int(place_holder_1[i]))
+            items[2]['unit'].append(place_holder_2[i])
+            items[3]['unit_price'].append(int(place_holder_3[i]))
+
+        print(f'====items==>>{items}')
+        return items
 
 def add_item(name='', quantity ='', unit='', unit_price=''):
     print('Adding to warehouse...')
@@ -42,9 +77,6 @@ def add_item(name='', quantity ='', unit='', unit_price=''):
     items[3]['unit_price'].append(int(input('Item price in PLN: ')))
     print('Successfully added to warehouse. The current status is: ')
     get_items()
-
-def get_costs():
-    pass
 
 def sold_items_summary(name, quantity,unit,unit_price):
     sold_items[0]['name'].append(name)
@@ -110,9 +142,12 @@ def get_items():
     print('----\t--------\t----\t----------------')
     
     a = []
+    print(items)
+
     for param in items:
         for item in param.values():
             a.append(item)
+            
     i = 0
     for entry in a[0]:
         print(a[0][i],'\t',a[1][i],'\t       ',a[2][i],'\t',a[3][i])
