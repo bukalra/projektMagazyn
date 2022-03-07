@@ -14,7 +14,6 @@ def export_file_to_csv():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         
-        row = []
         for product in items_modified:
             writer.writerow({'name':product['name'],'quantity':product['quantity'],'unit':product['unit'],'unit_price':product['unit_price']})
         print('Successfully exported data to magazyn.csv.')
