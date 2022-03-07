@@ -23,8 +23,6 @@ def import_items_from_csv():
     with open('magazyn.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
 
-        global items_modified
-        items_modified = []
         for row in reader:
             items_modified.append({'name':row['name'], 'quantity':row['quantity'], 'unit':row['unit'], 'unit_price':row['unit_price']})
         print('Successfully loaded data from magazyn.csv.')
